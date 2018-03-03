@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using Microsoft.Extensions.DiagnosticAdapter.Internal;
 
 namespace TDDSample.Web.Models.Rentals
 {
@@ -22,7 +24,36 @@ namespace TDDSample.Web.Models.Rentals
          */
         public string Statement()
         {
-            return null;
+            var fee = RentalFee();
+            return $"{fee:N0} 円";
+        }
+
+        public int RentalFee()
+        {
+            
+            var fee = 0;
+
+            foreach (var t in _rentals)
+            {
+                fee += Fee(t);
+            }
+
+            return fee;
+        }
+
+        private static int Fee(Rental t)
+        {
+            if (t.Movie.RentalType == MovieRentalType.Regular)
+            {
+                return 200;
+            }
+
+            if (t.Movie.RentalType == MovieRentalType.NewRelease)
+            {
+                return 300 * t.DaysRented;
+            }
+
+            throw new InvalidOperationException();
         }
     }
 }
